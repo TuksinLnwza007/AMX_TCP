@@ -1,0 +1,4 @@
+PLC:
+  HOST : "192.168.3.200"
+  PORT : 502
+  Address : 1 #Slave number
