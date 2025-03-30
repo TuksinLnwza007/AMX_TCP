@@ -34,7 +34,7 @@ def read_coil(client, address, count=1): #01H -> Read Coil (0x) → M, Y
     try:
         response = client.read_coils(address=address, count=count, unit=unit_id)
         if not response.isError():
-            return response.bits
+            return response.bits[0]
         else:
             print(f"Read Coil {type_bit}: {address} Error: {response}")
             return None
@@ -158,7 +158,7 @@ def main():
                     sleep(0.3)
                     if i > 0:
                         write_single_coil(client, i-1, False) 
-                        y = read_coil(client, i, 1)
+                        y = read_discrete_input(client, i, 1)
                         if y is not None:
                             pass
 
