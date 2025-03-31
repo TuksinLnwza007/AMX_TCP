@@ -1,5 +1,4 @@
-from pymodbus.client.sync import ModbusTcpClient  # pymodbus version 2.5.3
-from time import sleep
+from pymodbus.client.sync import ModbusTcpClient  #pymodbus version 2.5.3
 '''
 Function Code	คำสั่ง Modbus	            Modbus Address	  ใช้กับ Component	 
 01H	            Read Coils	              0x (00001)	    M, Y	          
@@ -26,11 +25,12 @@ X0~X377 -> Modbus 8448~8703 -> Function 02
 D0~D7999 -> Modbus D8000~D8511 -> Function 03, 04, 06, 10
 
 '''
-class Amx_tcp:
+class AMX_TCP:
 
-    def __init__(self, ip: str, port: int):
+    def __init__(self,ip:str,port:int,unit_id:int):
         self.__ip = ip
         self.__port = port
+        self.__unit_id = unit_id
         self.client = ModbusTcpClient(self.__ip, self.__port)
         connection = self.client.connect()
         if connection:
@@ -58,16 +58,10 @@ class Amx_tcp:
         else:
             raise ValueError(f"Invalid word address prefix in: {data}")
 
-        
-    def read_coil(self,address:str) -> bool:
+    def read_bit(self,address:str) -> bool:
         try:
             coil_address = self.__offset_coil(address)
-            
-            if coil_address < 8448:
-                response = self.client.read_coils(coil_address, count=1, unit=1) #01H
-            else:
-                response = self.client.read_discrete_inputs(coil_address, count=1, unit=1) #02H
-                
+            response = self.client.read_discrete_inputs(coil_address,count=1,unit=self.__unit_id) #02H Read Discrete Inputs MXY
             if not response.isError():
                 return response.bits[0]
             else:
@@ -77,7 +71,42 @@ class Amx_tcp:
         except Exception as e:
             print(f"Error: {e}")
             return None
-
+        
+    def read_word(self,address:str) -> int:
+        try:
+            word_address = self.__offset_word(address)
+            response = self.client.read_input_registers(word_address,count=1,unit=self.__unit_id) #04H Read Input Registers D
+            if not response.isError():
+                return response.registers[0]
+            else:
+                print(f"Read Word Error at address {address}: {response}")
+                return None
+        except Exception as e:
+            print(f"Error: {e}")
+            return None
+        
+    def write_bit(self,address:str,value:bool):
+        try:
+            coil_address = self.__offset_coil(address)
+            response = self.client.write_coil(coil_address,value,unit=self.__unit_id) #05H Single Coil MY
+            if response.isError():
+                print(f"Failed to write {value} to {address}")
+                return False
+            return True
+        except Exception as e:
+            print(f"Error: {e}")
+            
+    def write_word(self,address:str,value:int):
+        try:
+            word_address = self.__offset_word(address)
+            response = self.client.write_register(word_address,value,unit=self.__unit_id) #06H Single Register D
+            if response.isError():
+                print(f"Failed to write {value} to {address}")
+                return False
+            return True
+        except Exception as e:
+            print(f"Error: {e}")
+            
     def __del__(self):
         if self.client:
             self.client.close()
