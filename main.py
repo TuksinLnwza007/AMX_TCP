@@ -1,4 +1,4 @@
-from AMX_TCP_CLASS import AMX_TCP
+from FX5U_TCP_CLASS import FX5U_TCP
 import yaml
 
 with open("setup.yaml", "r", encoding="utf-8") as file:
@@ -8,7 +8,7 @@ IP = info["PLC"]["HOST"]
 PORT = info["PLC"]["PORT"]
 unit_id = info["PLC"]["Address"]
 
-plc = AMX_TCP(IP,PORT,unit_id)
+plc = FX5U_TCP(IP,PORT,unit_id)
 
 while True:
     try:
@@ -27,7 +27,7 @@ while True:
                     
             elif msg_2 == 2:
                 msg_3 = input("Word address: ").strip()
-                msg = plc.read_word(msg_3)
+                msg = plc.read_holding(msg_3)
                 if msg is not None:
                     print(f"Value at {msg_3}: {msg}")
                 else:
@@ -48,7 +48,7 @@ while True:
             elif msg_2 == 2:
                 msg_3 = input("Word address: ").strip()
                 msg_4 = int(input("Value: ").strip())
-                result = plc.write_word(msg_3, msg_4)
+                result = plc.write_holding(msg_3, msg_4)
                 if result:
                     print(f"Successfully write {msg_4} to {msg_3}")
                 else:
