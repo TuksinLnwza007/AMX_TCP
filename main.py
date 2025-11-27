@@ -1,61 +1,16 @@
 from FX5U_TCP_CLASS import FX5U_TCP
 import yaml
+import time
 
-with open("setup.yaml", "r", encoding="utf-8") as file:
-    info = yaml.safe_load(file)
-
-IP = info["PLC"]["HOST"]
-PORT = info["PLC"]["PORT"]
-unit_id = info["PLC"]["Address"]
-
-plc = FX5U_TCP(IP,PORT,unit_id)
-
-while True:
-    try:
-        msg_1 = int(input("Select mode 1(Read)/2(Write): ").strip())
+plc = FX5U_TCP("192.168.3.200", port=502, unit_id=1)
+print("Connected?", plc.is_connected())
         
-        if msg_1 == 1:
-            msg_2 = int(input("Select 1(Bit)/2(Word): ").strip())
-            
-            if msg_2 == 1: 
-                msg_3 = input("Bit address: ").strip()
-                msg = plc.read_bit(msg_3)
-                if msg is not None:
-                    print(f"Value at {msg_3}: {msg}")
-                else:
-                    print(f"Error reading bit at {msg_3}")
-                    
-            elif msg_2 == 2:
-                msg_3 = input("Word address: ").strip()
-                msg = plc.read_holding(msg_3)
-                if msg is not None:
-                    print(f"Value at {msg_3}: {msg}")
-                else:
-                    print(f"Error reading word at {msg_3}")
+def main():
+    while True:
 
-        elif msg_1 == 2:
-            msg_2 = int(input("Select 1(Bit)/2(Word): ").strip())
+        coil_addr = plc.read_bit("M0")
+        print("M0 =", coil_addr)
+        time.sleep(0.1)
 
-            if msg_2 == 1:
-                msg_3 = input("Bit address: ").strip()
-                msg_4 = input("True/false (1/0): ").strip() == "1"
-                result = plc.write_bit(msg_3, msg_4)
-                if result:
-                    print(f"Successfully wrote {msg_4} to {msg_3}")
-                else:
-                    print(f"Failed to write {msg_4} to {msg_3}")
-
-            elif msg_2 == 2:
-                msg_3 = input("Word address: ").strip()
-                msg_4 = int(input("Value: ").strip())
-                result = plc.write_holding(msg_3, msg_4)
-                if result:
-                    print(f"Successfully write {msg_4} to {msg_3}")
-                else:
-                    print(f"Failed to write {msg_4} to {msg_3}")
-                    
-        else:
-            print("Invalid selection. Try again.")
-
-    except ValueError:
-        print("Invalid input. Please enter a valid number.")
+if __name__ == "__main__":
+    main()
