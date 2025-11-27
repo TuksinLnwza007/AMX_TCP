@@ -3,14 +3,6 @@ from typing import List, Optional, Union
 
 class FX5U_TCP:
     """
-    FX5U_TCP - Modbus TCP helper for FX5U PLC mapping (M, Y, X, D)
-    Default mapping assumptions (ตามภาพ Allocation):
-      - Y start modbus no. = 0 (Coils)
-      - X start modbus no. = 0 (Discrete Inputs)
-      - D start modbus no. = 0 (Input/Holding Registers)
-      - M mapping: uses Modbus addresses starting at 8192 (ตามตัวอย่างก่อนหน้า)
-    หากต้องการปรับ start offsets ให้ส่งพารามิเตอร์ตอนสร้าง instance
-    
     from FX5U_TCP_CLASS import FX5U_TCP
     import time
 
