@@ -1,19 +1,16 @@
-from FX5U_TCP_CLASS import FX5U_TCP
-import time
-import logging
-logging.basicConfig()
-log = logging.getLogger()
-log.setLevel(logging.DEBUG)
+# main.py
+import sys
+from SerialInputDialog import SerialInputDialog
+from PyQt6.QtWidgets import QApplication
 
-plc = FX5U_TCP("192.168.3.200", port=502, unit_id=1)
-print("Connected?", plc.is_connected())
-        
-def main():
-    while True:
+app = QApplication(sys.argv)
 
-        coil_addr = plc.read_bit("M0")
-        print("M0 =", coil_addr)
-        time.sleep(5)
+dlg = SerialInputDialog()  
+result = dlg.exec_and_get()
 
-if __name__ == "__main__":
-    main()
+if result == 0:
+    print(f'Returned value: {result}')
+else:
+    print(f'Serial Number: {result}')
+
+sys.exit(0)
